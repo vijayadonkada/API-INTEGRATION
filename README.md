@@ -30,3 +30,7 @@ The application enhances user interaction through immediate feedback, error mess
 * Error handling for invalid or empty input
 
 This weather app project is ideal for learning how to integrate **APIs with front-end technologies**, manage **asynchronous data**, and apply **responsive design** principles effectively.
+
+**OUTPUT**    :
+
+![Image](https://github.com/user-attachments/assets/a09e33aa-9144-4c6e-acf0-f8a60f4eb0e8)

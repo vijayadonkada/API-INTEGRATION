@@ -4,13 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Weather App</title>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
+    /* Reset and font */
     * {
       box-sizing: border-box;
       font-family: 'Poppins', sans-serif;
     }
 
+    /* Background and text styles */
     body {
       margin: 0;
       padding: 0;
@@ -19,6 +24,7 @@
       color: white;
     }
 
+    /* Container box */
     .container {
       max-width: 500px;
       margin: 100px auto;
@@ -73,15 +79,31 @@
       font-style: italic;
       font-size: 1.2em;
     }
+
+    .extra-info {
+      margin-top: 10px;
+      font-size: 1em;
+    }
+
+    .extra-info div {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Main container -->
   <div class="container">
     <h1>🌤️ Weather Info</h1>
-    <input type="text" id="city" placeholder="Enter City Name">
+
+    <!-- City input field -->
+    <input type="text" id="city" placeholder="Enter City Name" />
     <br>
+
+    <!-- Button to fetch weather -->
     <button onclick="getWeather()">Get Weather</button>
+
+    <!-- Weather results container -->
     <div class="weather-result" id="weather"></div>
   </div>
 
@@ -89,20 +111,48 @@
     async function getWeather() {
       const apiKey = 'c55eca84e3fc1bfe164b3de8c35cecc4'; // Replace with your OpenWeatherMap API key
       const city = document.getElementById('city').value;
+
+      // Weather API URL
       const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
       try {
         const response = await fetch(url);
         const data = await response.json();
 
+        // If city is found
         if (data.cod === 200) {
+          const iconUrl = `http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+
+          // Construct weather HTML with more data
           const weatherHTML = `
-            <img class="weather-icon" src="http://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" />
+            <img class="weather-icon" src="${iconUrl}" alt="Weather icon" />
             <div class="temp">${data.main.temp}°C</div>
             <div class="description">${data.weather[0].description}</div>
             <div>🌍 ${data.name}, ${data.sys.country}</div>
+            <div class="extra-info">
+              <div>💧 Humidity: ${data.main.humidity}%</div>
+              <div>🌬️ Wind Speed: ${data.wind.speed} m/s</div>
+              <div>🔽 Pressure: ${data.main.pressure} hPa</div>
+              <div>🕒 Feels Like: ${data.main.feels_like}°C</div>
+              <div>🌡️ Min Temp: ${data.main.temp_min}°C / Max Temp: ${data.main.temp_max}°C</div>
+              <!-- Placeholder for AQI -->
+              <div id="aqi">🌫️ AQI: Loading...</div>
+            </div>
           `;
+
           document.getElementById('weather').innerHTML = weatherHTML;
+
+          // Get AQI using coordinates
+          const lat = data.coord.lat;
+          const lon = data.coord.lon;
+          const aqiUrl = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+
+          const aqiResponse = await fetch(aqiUrl);
+          const aqiData = await aqiResponse.json();
+          const aqi = aqiData.list[0].main.aqi;
+
+          const aqiLevels = ["Good", "Fair", "Moderate", "Poor", "Very Poor"];
+          document.getElementById('aqi').innerText = `🌫️ AQI: ${aqi} (${aqiLevels[aqi - 1]})`;
         } else {
           document.getElementById('weather').innerHTML = `<p>❌ City not found</p>`;
         }
